@@ -26,7 +26,7 @@ func TestLogger(t *testing.T) {
 	for _, test := range tc {
 		t.Run(test.name, func(t *testing.T) {
 			buf := bytes.Buffer{}
-			logger := NewConfigurableLogger(&buf, test.logLevel, false)
+			logger := NewConfigurableLogger(&buf, test.logLevel, false, false)
 			_, err := logger.LogWithLevel(test.wantedLogLevel, test.in)
 
 			handleError(t, test.err, err)

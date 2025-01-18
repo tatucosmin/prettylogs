@@ -25,9 +25,10 @@ const (
 )
 
 type Logger struct {
-	writer          io.Writer
-	level           LoggerLevel
-	disablePrefixes bool
+	writer            io.Writer
+	level             LoggerLevel
+	disablePrefixes   bool
+	disableTimestamps bool
 }
 
 const (
@@ -42,19 +43,21 @@ var LogLevelPrefixes = map[LoggerLevel]string{
 	LogFatalLevel:   "[FATAL]",
 }
 
-func NewConfigurableLogger(w io.Writer, level LoggerLevel, disablePrexies bool) *Logger {
+func NewConfigurableLogger(w io.Writer, level LoggerLevel, disablePrexies, disableTimestamps bool) *Logger {
 	return &Logger{
 		w,
 		level,
 		disablePrexies,
+		disableTimestamps,
 	}
 }
 
 func NewDefaultLogger() *Logger {
 	return &Logger{
-		writer:          os.Stdout,
-		level:           LogInfoLevel,
-		disablePrefixes: false,
+		writer:            os.Stdout,
+		level:             LogInfoLevel,
+		disablePrefixes:   false,
+		disableTimestamps: false,
 	}
 }
 
@@ -62,7 +65,13 @@ func (logger *Logger) SetLoggerLevel(level LoggerLevel) {
 	logger.level = level
 }
 
-func (logger *Logger) handleLogPrefixFormat(prefix, str string) (int, error) {
+func (logger *Logger) handleLogPrefixFormat(str string) (int, error) {
+	var prefix string
+	if !logger.disablePrefixes {
+		if pf, ok := LogLevelPrefixes[logger.level]; ok {
+			prefix = pf
+		}
+	}
 	if prefix == "" {
 		return fmt.Fprintf(logger.writer, "%v", str)
 	}
@@ -70,14 +79,7 @@ func (logger *Logger) handleLogPrefixFormat(prefix, str string) (int, error) {
 }
 
 func (logger *Logger) Log(str string) (int, error) {
-	var prefix string
-	if !logger.disablePrefixes {
-		if pf, ok := LogLevelPrefixes[logger.level]; ok {
-			prefix = pf
-		}
-	}
-
-	return logger.handleLogPrefixFormat(prefix, str)
+	return logger.handleLogPrefixFormat(str)
 
 }
 
@@ -86,14 +88,7 @@ func (logger *Logger) LogWithLevel(level LoggerLevel, str string) (int, error) {
 		return 0, ErrUnderLoggerLevel
 	}
 
-	var prefix string
-	if !logger.disablePrefixes {
-		if pf, ok := LogLevelPrefixes[level]; ok {
-			prefix = pf
-		}
-	}
-
-	return logger.handleLogPrefixFormat(prefix, str)
+	return logger.handleLogPrefixFormat(str)
 
 }
 
