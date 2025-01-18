@@ -1,4 +1,4 @@
-package main
+package prettylogs
 
 import (
 	"fmt"
@@ -56,6 +56,10 @@ func NewDefaultLogger() *Logger {
 		level:           LogInfoLevel,
 		disablePrefixes: false,
 	}
+}
+
+func (logger *Logger) SetLoggerLevel(level LoggerLevel) {
+	logger.level = level
 }
 
 func (logger *Logger) handleLogPrefixFormat(prefix, str string) (int, error) {
