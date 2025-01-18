@@ -64,3 +64,7 @@ fmt.Printf("debug value: %v\n")
 To simplify this, I created a library that provides a cleaner and more structured way to debug values with minimal boilerplate.
 
 # 👏 Contributing
+
+I'd love some help on this project. If you'd like to contribute, please fork this project and open pull requests.
+
+Please make sure all existing tests pass before submitting your pull request and your own tests if that's the case.
