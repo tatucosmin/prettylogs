@@ -42,7 +42,15 @@ var LogLevelPrefixes = map[LoggerLevel]string{
 	LogFatalLevel:   "[FATAL]",
 }
 
-func NewLogger() *Logger {
+func NewConfigurableLogger(w io.Writer, level LoggerLevel, disablePrexies bool) *Logger {
+	return &Logger{
+		w,
+		level,
+		disablePrexies,
+	}
+}
+
+func NewDefaultLogger() *Logger {
 	return &Logger{
 		writer:          os.Stdout,
 		level:           LogInfoLevel,
@@ -52,9 +60,9 @@ func NewLogger() *Logger {
 
 func (logger *Logger) handleLogPrefixFormat(prefix, str string) (int, error) {
 	if prefix == "" {
-		return fmt.Fprintf(logger.writer, "%v\n", str)
+		return fmt.Fprintf(logger.writer, "%v", str)
 	}
-	return fmt.Fprintf(logger.writer, "%s %v\n", prefix, str)
+	return fmt.Fprintf(logger.writer, "%s %v", prefix, str)
 }
 
 func (logger *Logger) Log(str string) (int, error) {
