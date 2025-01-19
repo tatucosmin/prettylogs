@@ -27,7 +27,7 @@ func main() {
 
 	/*
 		final output:
-		2025-01-19 15:22:31 [INFO] this is a warn log
+		2025-01-19 15:22:31 [WARN] this is a warn log
 		2025-01-19 15:22:31 [INFO] this is an info log
 		2025-01-19 15:22:31 [DEBUG] this message will print
 	*/
