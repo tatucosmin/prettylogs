@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
+	"time"
 )
 
 type ConfigurableLogger struct {
@@ -43,7 +45,7 @@ var LogLevelPrefixes = map[LoggerLevel]string{
 	LogFatalLevel:   "[FATAL]",
 }
 
-func NewConfigurableLogger(w io.Writer, level LoggerLevel, disablePrexies, disableTimestamps bool) *Logger {
+func NewConfigurable(w io.Writer, level LoggerLevel, disablePrexies, disableTimestamps bool) *Logger {
 	return &Logger{
 		w,
 		level,
@@ -52,7 +54,7 @@ func NewConfigurableLogger(w io.Writer, level LoggerLevel, disablePrexies, disab
 	}
 }
 
-func NewDefaultLogger() *Logger {
+func New() *Logger {
 	return &Logger{
 		writer:            os.Stdout,
 		level:             LogInfoLevel,
@@ -65,22 +67,32 @@ func (logger *Logger) SetLoggerLevel(level LoggerLevel) {
 	logger.level = level
 }
 
-func (logger *Logger) handleLogPrefixFormat(str string) (int, error) {
-	var prefix string
+func (logger *Logger) handleLogFormat(str string) (int, error) {
+	var components []string
+
+	// !!! The order of these comparisons is important as the expected way would be time, level, msg
+	// * Instead of appending maybe I should index into the array to make sure order is always respected
+
+	if !logger.disableTimestamps {
+		timestamp := time.Now().Format(time.DateTime)
+		components = append(components, timestamp)
+	}
+
 	if !logger.disablePrefixes {
 		if pf, ok := LogLevelPrefixes[logger.level]; ok {
-			prefix = pf
+			components = append(components, pf)
 		}
 	}
-	if prefix == "" {
-		return fmt.Fprintf(logger.writer, "%v", str)
-	}
-	return fmt.Fprintf(logger.writer, "%s %v", prefix, str)
+
+	components = append(components, fmt.Sprintf("%v", str))
+
+	format := strings.Join(components, " ")
+
+	return fmt.Fprintf(logger.writer, "%s", format)
 }
 
 func (logger *Logger) Log(str string) (int, error) {
-	return logger.handleLogPrefixFormat(str)
-
+	return logger.handleLogFormat(str)
 }
 
 func (logger *Logger) LogWithLevel(level LoggerLevel, str string) (int, error) {
@@ -88,7 +100,7 @@ func (logger *Logger) LogWithLevel(level LoggerLevel, str string) (int, error) {
 		return 0, ErrUnderLoggerLevel
 	}
 
-	return logger.handleLogPrefixFormat(str)
+	return logger.handleLogFormat(str)
 
 }
 

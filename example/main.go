@@ -5,13 +5,13 @@ import (
 )
 
 func main() {
-	logger := plogs.NewDefaultLogger()
+	logger := plogs.New()
 	/*
-		NewDefaultLogger will intialize with this data as default
+		New will intialize with this data as default
 		- os.Stdout as the io.Writer
 		- LogInfoLevel which will only print logs with level >= LogInfoLevel
 		- prefixes (e.g. [DEBUG], [INFO], etc) enabled
-		note: if you need more granular Logger initialization use the NewConfigurableLogger function
+		note: if you need more granular Logger initialization use the NewConfigurable function
 	*/
 
 	logger.Warn("this is a warn log\n")

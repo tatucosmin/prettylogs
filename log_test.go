@@ -7,6 +7,9 @@ import (
 
 func TestLogger(t *testing.T) {
 
+	disableTimestamps := false
+	disablePrefixes := false
+
 	tc := []struct {
 		name           string
 		in             string
@@ -21,28 +24,32 @@ func TestLogger(t *testing.T) {
 		{"an error level test", "test", LogErrorLevel, "[ERROR] test", LogErrorLevel, nil},
 		{"a fatal level test", "test", LogFatalLevel, "[FATAL] test", LogFatalLevel, nil},
 		{"a warning level message which should not be written", "test", LogErrorLevel, "", LogWarningLevel, ErrUnderLoggerLevel},
+		{"a timestamp test", "test", LogFatalLevel, "[FATAL] test", LogFatalLevel, nil},
 	}
 
 	for _, test := range tc {
 		t.Run(test.name, func(t *testing.T) {
 			buf := bytes.Buffer{}
-			logger := NewConfigurableLogger(&buf, test.logLevel, false, false)
+			logger := NewConfigurable(&buf, test.logLevel, disablePrefixes, disableTimestamps)
 			_, err := logger.LogWithLevel(test.wantedLogLevel, test.in)
 
-			handleError(t, test.err, err)
+			assertError(t, test.err, err)
 
 			got := buf.String()
-
-			if got != test.want {
-				t.Fatalf("expected output %s but got %s", buf.String(), test.in)
-			}
+			assertStrings(t, got, test.want)
 		})
 	}
 
 }
 
-func handleError(t testing.TB, got, want error) {
+func assertError(t testing.TB, got, want error) {
 	if got != want {
 		t.Fatalf("expected error %v but got %v", got, want)
+	}
+}
+
+func assertStrings(t testing.TB, got, want string) {
+	if got != want {
+		t.Fatalf("expected output %s but got %s", got, want)
 	}
 }
