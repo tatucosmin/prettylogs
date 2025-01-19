@@ -16,10 +16,10 @@ func main() {
 	*/
 
 	logger.Warn("this is a warn log\n")
-	// this will print "[WARN] this is a warn log" without changing the default level
+	// prints "[WARN] this is a warn log" without changing the default level
 
 	logger.Log("this is an info log\n")
-	// this will print "[INFO] this an info log" as by default the logger has the LogInfoLevel set
+	// prints "[INFO] this an info log" as by default the logger has the LogInfoLevel set
 
 	logger.LogWithLevel(plogs.LogDebugLevel, "this message will NOT print\n")
 	logger.SetLoggerLevel(plogs.LogDebugLevel)

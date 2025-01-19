@@ -67,7 +67,7 @@ func (logger *Logger) SetLoggerLevel(level LoggerLevel) {
 	logger.level = level
 }
 
-func (logger *Logger) handleLogFormat(str string) (int, error) {
+func (logger *Logger) handleLogFormat(str string, level LoggerLevel) (int, error) {
 	var components []string
 
 	// !!! The order of these comparisons is important as the expected way would be time, level, msg
@@ -79,7 +79,7 @@ func (logger *Logger) handleLogFormat(str string) (int, error) {
 	}
 
 	if !logger.disablePrefixes {
-		if pf, ok := LogLevelPrefixes[logger.level]; ok {
+		if pf, ok := LogLevelPrefixes[level]; ok {
 			components = append(components, pf)
 		}
 	}
@@ -92,7 +92,7 @@ func (logger *Logger) handleLogFormat(str string) (int, error) {
 }
 
 func (logger *Logger) Log(str string) (int, error) {
-	return logger.handleLogFormat(str)
+	return logger.handleLogFormat(str, logger.level)
 }
 
 func (logger *Logger) LogWithLevel(level LoggerLevel, str string) (int, error) {
@@ -100,7 +100,7 @@ func (logger *Logger) LogWithLevel(level LoggerLevel, str string) (int, error) {
 		return 0, ErrUnderLoggerLevel
 	}
 
-	return logger.handleLogFormat(str)
+	return logger.handleLogFormat(str, level)
 
 }
 

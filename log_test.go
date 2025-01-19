@@ -9,7 +9,7 @@ func TestLogger(t *testing.T) {
 
 	// TODO: Fix tests for timestmaps
 
-	disableTimestamps := false
+	disableTimestamps := true
 	disablePrefixes := false
 
 	tc := []struct {
