@@ -5,8 +5,8 @@ A simple logging library in Go. Pretty logs currently is supporting the followin
 - [x] Logging different log levels (e.g. Debug, Warning, Error, etc.)
 - [x] Support for any io.Writer
 - [x] Ability to disable prefixes (e.g. `[DEBUG]`, `[INFO]`, etc.)
+- [x] Add timestamps option
 - [ ] Add flag to enable colorful output to os.Stdout
-- [ ] Add timestamps option
 - [ ] Add structured logging support with JSON
 
 # ⚙️ Installation

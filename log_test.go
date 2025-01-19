@@ -7,8 +7,6 @@ import (
 
 func TestLogger(t *testing.T) {
 
-	// TODO: Fix tests for timestmaps
-
 	disableTimestamps := true
 	disablePrefixes := false
 
