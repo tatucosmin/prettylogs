@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
+	"time"
 )
 
 type ConfigurableLogger struct {
@@ -25,9 +27,10 @@ const (
 )
 
 type Logger struct {
-	writer          io.Writer
-	level           LoggerLevel
-	disablePrefixes bool
+	writer            io.Writer
+	level             LoggerLevel
+	disablePrefixes   bool
+	disableTimestamps bool
 }
 
 const (
@@ -42,19 +45,21 @@ var LogLevelPrefixes = map[LoggerLevel]string{
 	LogFatalLevel:   "[FATAL]",
 }
 
-func NewConfigurableLogger(w io.Writer, level LoggerLevel, disablePrexies bool) *Logger {
+func NewConfigurable(w io.Writer, level LoggerLevel, disablePrexies, disableTimestamps bool) *Logger {
 	return &Logger{
 		w,
 		level,
 		disablePrexies,
+		disableTimestamps,
 	}
 }
 
-func NewDefaultLogger() *Logger {
+func New() *Logger {
 	return &Logger{
-		writer:          os.Stdout,
-		level:           LogInfoLevel,
-		disablePrefixes: false,
+		writer:            os.Stdout,
+		level:             LogInfoLevel,
+		disablePrefixes:   false,
+		disableTimestamps: false,
 	}
 }
 
@@ -62,23 +67,32 @@ func (logger *Logger) SetLoggerLevel(level LoggerLevel) {
 	logger.level = level
 }
 
-func (logger *Logger) handleLogPrefixFormat(prefix, str string) (int, error) {
-	if prefix == "" {
-		return fmt.Fprintf(logger.writer, "%v", str)
-	}
-	return fmt.Fprintf(logger.writer, "%s %v", prefix, str)
-}
+func (logger *Logger) handleLogFormat(str string, level LoggerLevel) (int, error) {
+	var components []string
 
-func (logger *Logger) Log(str string) (int, error) {
-	var prefix string
+	// !!! The order of these comparisons is important as the expected way would be time, level, msg
+	// * Instead of appending maybe I should index into the array to make sure order is always respected
+
+	if !logger.disableTimestamps {
+		timestamp := time.Now().Format(time.DateTime)
+		components = append(components, timestamp)
+	}
+
 	if !logger.disablePrefixes {
-		if pf, ok := LogLevelPrefixes[logger.level]; ok {
-			prefix = pf
+		if pf, ok := LogLevelPrefixes[level]; ok {
+			components = append(components, pf)
 		}
 	}
 
-	return logger.handleLogPrefixFormat(prefix, str)
+	components = append(components, fmt.Sprintf("%v", str))
 
+	format := strings.Join(components, " ")
+
+	return fmt.Fprintf(logger.writer, "%s", format)
+}
+
+func (logger *Logger) Log(str string) (int, error) {
+	return logger.handleLogFormat(str, logger.level)
 }
 
 func (logger *Logger) LogWithLevel(level LoggerLevel, str string) (int, error) {
@@ -86,14 +100,7 @@ func (logger *Logger) LogWithLevel(level LoggerLevel, str string) (int, error) {
 		return 0, ErrUnderLoggerLevel
 	}
 
-	var prefix string
-	if !logger.disablePrefixes {
-		if pf, ok := LogLevelPrefixes[level]; ok {
-			prefix = pf
-		}
-	}
-
-	return logger.handleLogPrefixFormat(prefix, str)
+	return logger.handleLogFormat(str, level)
 
 }
 

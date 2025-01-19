@@ -5,8 +5,8 @@ A simple logging library in Go. Pretty logs currently is supporting the followin
 - [x] Logging different log levels (e.g. Debug, Warning, Error, etc.)
 - [x] Support for any io.Writer
 - [x] Ability to disable prefixes (e.g. `[DEBUG]`, `[INFO]`, etc.)
+- [x] Add timestamps option
 - [ ] Add flag to enable colorful output to os.Stdout
-- [ ] Add timestamps option
 - [ ] Add structured logging support with JSON
 
 # ⚙️ Installation
@@ -25,13 +25,14 @@ import (
 )
 
 func main() {
-	logger := plogs.NewDefaultLogger()
+	logger := plogs.New()
 	/*
-		NewDefaultLogger will intialize with this data as default
+		New will intialize with this data as default
 		- os.Stdout as the io.Writer
 		- LogInfoLevel which will only print logs with level >= LogInfoLevel
 		- prefixes (e.g. [DEBUG], [INFO], etc) enabled
-		note: if you need a more granular Logger initialization use the NewConfigurableLogger function
+		- timestamps enabled
+		note: if you need more granular Logger initialization use the NewConfigurable function
 	*/
 
 	logger.Warn("this is a warn log\n")
@@ -46,9 +47,9 @@ func main() {
 
 	/*
 		final output:
-		[WARN] this is a warn log
-		[INFO] this is an info log
-		[DEBUG] this message will print
+		2025-01-19 15:22:31 [WARN] this is a warn log
+		2025-01-19 15:22:31 [INFO] this is an info log
+		2025-01-19 15:22:31 [DEBUG] this message will print
 	*/
 }
 ```
